@@ -1,94 +1,84 @@
-use std::fmt;
-use std::mem;
+// An attribute to hide warnings for unused code.
+#![allow(dead_code)]
+
+// use std::fmt;
+// use std::mem;
 
 #[derive(Debug)]
-struct Structure(i32);
-
-impl fmt::Display for Structure {
-    // This trait requires `fmt` with this exact signature.
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.0)
-    }
+struct Person {
+    name: String,
+    age: u8,
 }
 
-// The following struct is for the activity.
-#[derive(Debug)]
-struct Matrix(f32, f32, f32, f32);
+// A unit struct
+struct Unit;
 
-impl fmt::Display for Matrix {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {}, {})", self.0, self.1, self.2, self.3)
-    }
+// A tuple struct
+struct Pair(i32, f32);
+
+// A struct with two fields
+struct Point {
+    x: f32,
+    y: f32,
 }
 
-// a note: rust has implied returns
-fn reverse(pair: (i32, bool)) -> (bool, i32) {
-    // `let` can be used to bind the members of a tuple to variables.
-    let (int_param, bool_param) = pair;
-
-    return (bool_param, int_param)
+// Structs can be reused as fields of another struct
+struct Rectangle {
+    // A rectangle can be specified by where the top left and bottom right
+    // corners are in space.
+    top_left: Point,
+    bottom_right: Point,
 }
 
-fn transpose(m: Matrix) -> Matrix {
-    let a = m.0;
-    let b = m.1;
-
-    let t = Matrix(b, a, m.2, m.3);
-    return t;
-}
-
-// This function borrows a slice.
-fn analyze_slice(slice: &[i32]) {
-    println!("First element of the slice: {}", slice[0]);
-    println!("The slice has {} elements", slice.len());
-}
-
-// here in the rust by example site, https://doc.rust-lang.org/rust-by-example/primitives/array.html    let s = Structure(1);
+// here in the rust by example site, https://doc.rust-lang.org/rust-by-example/custom_types/structs.html
 fn main() {
 
     println!("Hello, world!");
 
-    let matrix = Matrix(1.1, 1.2, 2.1, 2.2);
-    println!("{}", matrix);
+    // Create struct with field init shorthand
+    let name = String::from("Peter");
+    let age = 27;
+    let peter = Person { name, age };
 
-    println!("Matrix: {}", matrix);
-    println!("Transpose:\n{}", transpose(matrix));
+    // Print debug struct
+    println!("{:?}", peter);
 
-    // Fixed-size array (type signature is superfluous).
-    let xs: [i32; 5] = [1, 2, 3, 4, 5];
+    // Instantiate a `Point`
+    let point: Point = Point { x: 5.2, y: 0.4 };
+    let another_point: Point = Point { x: 10.3, y: 0.2 };
 
-    // All elements can be initialized to the same value.
-    let ys: [i32; 500] = [0; 500];
+    // Access the fields of the point
+    println!("point coordinates: ({}, {})", point.x, point.y);
 
-    // Arrays are stack allocated.
-    println!("Array occupies {} bytes", mem::size_of_val(&xs));
+    // Make a new point by using struct update syntax to use the fields of our
+    // other one
+    let bottom_right = Point { x: 10.3, ..another_point };
 
-    // Arrays can be automatically borrowed as slices.
-    println!("Borrow the whole array as a slice.");
-    analyze_slice(&xs);
+    // `bottom_right.y` will be the same as `another_point.y` because we used that field
+    // from `another_point`
+    println!("second point: ({}, {})", bottom_right.x, bottom_right.y);
 
-    // Slices can point to a section of an array.
-    // They are of the form [starting_index..ending_index].
-    // `starting_index` is the first position in the slice.
-    // `ending_index` is one more than the last position in the slice.
-    println!("Borrow a section of the array as a slice.");
-    analyze_slice(&ys[1 .. 4]);
+    // Destructure the point using a `let` binding
+    let Point { x: left_edge, y: top_edge } = point;
 
-    // Example of empty slice `&[]`:
-    let empty_array: [u32; 0] = [];
-    assert_eq!(&empty_array, &[]);
-    assert_eq!(&empty_array, &[][..]); // Same but more verbose
+    let _rectangle = Rectangle {
+        // struct instantiation is an expression too
+        top_left: Point { x: left_edge, y: top_edge },
+        bottom_right: bottom_right,
+    };
 
-    // Arrays can be safely accessed using `.get`, which returns an
-    // `Option`. This can be matched as shown below, or used with
-    // `.expect()` if you would like the program to exit with a nice
-    // message instead of happily continue.
-    for i in 0..xs.len() + 1 { // Oops, one element too far!
-        match xs.get(i) {
-            Some(xval) => println!("{}: {}", i, xval),
-            None => println!("Slow down! {} is too far!", i),
-        }
-    }
+    // Instantiate a unit struct
+    let _unit = Unit;
 
+    // Instantiate a tuple struct
+    let pair = Pair(1, 0.1);
+
+    // Access the fields of a tuple struct
+    println!("pair contains {:?} and {:?}", pair.0, pair.1);
+
+    // Destructure a tuple struct
+    let Pair(integer, decimal) = pair;
+
+    println!("pair contains {:?} and {:?}", integer, decimal);
 
 }
