@@ -30,6 +30,14 @@ struct Rectangle {
     bottom_right: Point,
 }
 
+fn rect_area (rect: &Rectangle) -> f32 {
+
+    let (&Point { x: x1, y: y1 }, &Point { x: x2, y: y2 }) = (&rect.top_left, &rect.bottom_right);
+
+    return (x1 - x2) * (y1 - y2);
+
+}
+
 // here in the rust by example site, https://doc.rust-lang.org/rust-by-example/custom_types/structs.html
 fn main() {
 
@@ -80,5 +88,8 @@ fn main() {
     let Pair(integer, decimal) = pair;
 
     println!("pair contains {:?} and {:?}", integer, decimal);
+
+    let area = rect_area(&_rectangle);
+    println!("area of rectangle {}", area);
 
 }
