@@ -16,6 +16,7 @@ use rand::prelude::*;
 */
 
 struct Block {
+    // columns x rows
     grid: [[i8; 3]; 3]
 }
 
@@ -24,17 +25,40 @@ impl Block {
         Block { grid: [[0i8; 3]; 3] }
     }
 
-    pub fn print(self) {
-        println!("|------------------------------|");
+    pub fn print(&self) {
+        // on my terminal looks to be ~3 '-' per number
+
+        // just do multiple loops bro
+        let mut spacers: String = String::from("");
+        for _ in 0..self.grid.len() {
+            spacers = spacers + "---";
+        }
+        let header_footer_str = "| ".to_owned() + &spacers + " |";
+
+        println!("{}", header_footer_str);
+        
         for i in 0..self.grid.len() {
             let mut s: String = String::from("| ");
             for j in 0..self.grid[i].len() {
                let a = self.grid[i][j].to_string();
-               s = s.to_owned() + &a + " |"; 
+               s = s.to_owned() + &a + " | "; 
             }
             println!("{}", s);
         }
-        println!("|------------------------------|");
+
+        println!("{}", header_footer_str);
+    }
+
+    pub fn fill(&mut self) {
+        // Get an RNG:
+        let mut rng = rand::rng();
+
+        // fill in Block randomly
+        for i in 0..self.grid.len() {
+            for j in 0..self.grid[i].len() {
+                self.grid[i][j] = rng.random_range(1..10);
+            }
+        }
     }
 }
 
@@ -47,19 +71,13 @@ impl Block {
 fn main() {
 
     println!("Hello, World!");
-
     let mut block: Block = Block::new();
 
-    // Get an RNG:
-    let mut rng = rand::rng();
+    block.print();
 
-    // fill in Block randomly
-    for i in 0..block.grid.len() {
-        for j in 0..block.grid[i].len() {
-            block.grid[i][j] = rng.random_range(1..10);
-            //println!("x-index: {}, y-index: {}, value: {}", i, j, block.grid[i][j]);
-        }
-    }
+    println!();
+
+    block.fill();
 
     block.print();
 }
